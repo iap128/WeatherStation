@@ -296,7 +296,12 @@ int get_wind_direction()
 
 
 // SQL queries
-String INSERT_SQL = "INSERT INTO weather.temperature (temp, date) VALUES (51, '6/11/23');";
+//String INSERT_SQL = "INSERT INTO weather.temperature (temp, date) VALUES (51, '6/11/23');";
+String insertWindSpeed = "INSERT INTO weather.windSpeed (speed, date) VALUES (" + windspdmph_avg2m + ", '6/11/23');";
+String insertWindDirection = "INSERT INTO weather.windDirection (direction, date) VALUES (" + winddir_avg2m + ", '6/11/23');";
+String insertGustSpeed = "INSERT INTO weather.gustSpeed (speed, date) VALUES (" + windgustmph_10m + ", '6/11/23');";
+String insertGustDirection = "INSERT INTO weather.gustDirection (direction, date) VALUES (" + windgustdir_10m + ", '6/11/23');";
+String insertRain = "INSERT INTO weather.rain (quantity, date) VALUES (" + rainin + ", '6/11/23');";
 
 
 
@@ -329,8 +334,13 @@ void printWeather(const byte timeInterval)
   Serial.println("------------");*/
   Serial.println(timeInterval);
 
+  //every 2 minutes, insert the values into the SQL tables
   if (timeInterval == 119) {
-    runInsert(INSERT_SQL);
+    runInsert(insertWindSpeed);
+    runInsert(insertWindDirection);
+    runInsert(insertGustSpeed);
+    runInsert(insertGustDirection);
+    runInsert(insertRain);
   }
 }
 
