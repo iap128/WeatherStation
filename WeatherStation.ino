@@ -40,6 +40,9 @@ volatile byte windClicks = 0;
 byte windspdavg[120]; //120 bytes to keep track of 2 minute average
 
 #define WIND_DIR_AVG_SIZE 120
+float temperature;
+float humidity;
+float pressure;
 int winddiravg[WIND_DIR_AVG_SIZE]; //120 ints to keep track of 2 minute average
 float windgust_10m[10]; //10 floats to keep track of 10 minute max
 int windgustdirection_10m[10]; //10 ints to keep track of 10 minute max
@@ -199,6 +202,11 @@ void printLine()
 //Calculates each of the variables that wunderground is expecting
 void calcWeather()
 {
+  temperature = tempSensor.readTempF();
+  humidity = tempSensor.readFloatHumidity();
+  pressure = tempSensor.readFloatPressure();
+
+
   //Calc windspdmph_avg2m
   float temp = 0;
   for (int i = 0 ; i < 120 ; i++)
@@ -296,12 +304,14 @@ int get_wind_direction()
 
 
 // SQL queries
-//String INSERT_SQL = "INSERT INTO weather.temperature (temp, date) VALUES (51, '6/11/23');";
-String insertWindSpeed = "INSERT INTO weather.windSpeed (speed, date) VALUES (" + windspdmph_avg2m + ", '6/11/23');";
-String insertWindDirection = "INSERT INTO weather.windDirection (direction, date) VALUES (" + winddir_avg2m + ", '6/11/23');";
-String insertGustSpeed = "INSERT INTO weather.gustSpeed (speed, date) VALUES (" + windgustmph_10m + ", '6/11/23');";
-String insertGustDirection = "INSERT INTO weather.gustDirection (direction, date) VALUES (" + windgustdir_10m + ", '6/11/23');";
-String insertRain = "INSERT INTO weather.rain (quantity, date) VALUES (" + rainin + ", '6/11/23');";
+String insertTemp = "INSERT INTO weather.temperature (temp, date) VALUES (" + String(temperature) + ", '6/11/23');";
+String insertHumidity = "INSERT INTO weather.humidity (humidity, date) VALUES (" + String(humidity) + ", '6/11/23');";
+String insertPressure = "INSERT INTO weather.pressure (pressure, date) VALUES (" + String(pressure) + ", '6/11/23');";
+String insertWindSpeed = "INSERT INTO weather.windSpeed (speed, date) VALUES (" + String(windspdmph_avg2m) + ", '6/11/23');";
+String insertWindDirection = "INSERT INTO weather.windDirection (direction, date) VALUES (" + String(winddir_avg2m) + ", '6/11/23');";
+String insertGustSpeed = "INSERT INTO weather.gustSpeed (speed, date) VALUES (" + String(windgustmph_10m) + ", '6/11/23');";
+String insertGustDirection = "INSERT INTO weather.gustDirection (direction, date) VALUES (" + String(windgustdir_10m) + ", '6/11/23');";
+String insertRain = "INSERT INTO weather.rain (quantity, date) VALUES (" + String(rainin) + ", '6/11/23');";
 
 
 
@@ -311,7 +321,7 @@ void printWeather(const byte timeInterval)
 {
   calcWeather(); //Go calc all the various sensors
 
-  /*Serial.println();
+  Serial.println();
   Serial.print("Temperature: ");
   Serial.println(tempSensor.readTempF(), 2);
   Serial.print("Humidity: ");
@@ -331,11 +341,13 @@ void printWeather(const byte timeInterval)
   Serial.println(windgustdir_10m);
   Serial.print("Rain Quantity: ");
   Serial.println(rainin, 2);
-  Serial.println("------------");*/
-  Serial.println(timeInterval);
+  Serial.println("------------");
 
   //every 2 minutes, insert the values into the SQL tables
   if (timeInterval == 119) {
+    runInsert(insertTemp);
+    runInsert(insertHumidity);
+    runInsert(insertPressure);
     runInsert(insertWindSpeed);
     runInsert(insertWindDirection);
     runInsert(insertGustSpeed);
