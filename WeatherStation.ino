@@ -204,7 +204,7 @@ void calcWeather()
 {
   temperature = tempSensor.readTempF();
   humidity = tempSensor.readFloatHumidity();
-  pressure = tempSensor.readFloatPressure();
+  pressure = tempSensor.readFloatPressure()/33.864; //convert millibars to inches mercury
 
 
   //Calc windspdmph_avg2m
@@ -304,14 +304,14 @@ int get_wind_direction()
 
 
 // SQL queries
-String insertTemp = "INSERT INTO weather.temperature (temp, date) VALUES (" + String(temperature) + ", '6/11/23');";
-String insertHumidity = "INSERT INTO weather.humidity (humidity, date) VALUES (" + String(humidity) + ", '6/11/23');";
-String insertPressure = "INSERT INTO weather.pressure (pressure, date) VALUES (" + String(pressure) + ", '6/11/23');";
-String insertWindSpeed = "INSERT INTO weather.windSpeed (speed, date) VALUES (" + String(windspdmph_avg2m) + ", '6/11/23');";
-String insertWindDirection = "INSERT INTO weather.windDirection (direction, date) VALUES (" + String(winddir_avg2m) + ", '6/11/23');";
-String insertGustSpeed = "INSERT INTO weather.gustSpeed (speed, date) VALUES (" + String(windgustmph_10m) + ", '6/11/23');";
-String insertGustDirection = "INSERT INTO weather.gustDirection (direction, date) VALUES (" + String(windgustdir_10m) + ", '6/11/23');";
-String insertRain = "INSERT INTO weather.rain (quantity, date) VALUES (" + String(rainin) + ", '6/11/23');";
+String insertTemp = "INSERT INTO weather.temperature (temp, date) VALUES";
+String insertHumidity = "INSERT INTO weather.humidity (humidity, date) VALUES";
+String insertPressure = "INSERT INTO weather.pressure (pressure, date) VALUES";
+String insertWindSpeed = "INSERT INTO weather.windSpeed (speed, date) VALUES";
+String insertWindDirection = "INSERT INTO weather.windDirection (direction, date) VALUES";
+String insertGustSpeed = "INSERT INTO weather.gustSpeed (speed, date) VALUES";
+String insertGustDirection = "INSERT INTO weather.gustDirection (direction, date) VALUES";
+String insertRain = "INSERT INTO weather.rain (quantity, date) VALUES";
 
 
 
@@ -323,13 +323,11 @@ void printWeather(const byte timeInterval)
 
   Serial.println();
   Serial.print("Temperature: ");
-  Serial.println(tempSensor.readTempF(), 2);
+  Serial.println(temperature, 2);
   Serial.print("Humidity: ");
-  Serial.println(tempSensor.readFloatHumidity(), 0);
+  Serial.println(humidity, 0);
   Serial.print("Pressure: ");
-  Serial.println(tempSensor.readFloatPressure(), 0);
-  Serial.print("Altitude: ");
-  Serial.println(tempSensor.readFloatAltitudeFeet(), 1);
+  Serial.println(pressure, 0);
   Serial.println();
   Serial.print("Wind Speed: ");
   Serial.println(windspdmph_avg2m, 1);
@@ -345,30 +343,31 @@ void printWeather(const byte timeInterval)
 
   //every 2 minutes, insert the values into the SQL tables
   if (timeInterval == 119) {
-    runInsert(insertTemp);
-    runInsert(insertHumidity);
-    runInsert(insertPressure);
-    runInsert(insertWindSpeed);
-    runInsert(insertWindDirection);
-    runInsert(insertGustSpeed);
-    runInsert(insertGustDirection);
-    runInsert(insertRain);
+    runInsert(insertTemp, String(temperature));
+    runInsert(insertHumidity, String(humidity));
+    runInsert(insertPressure, String(pressure));
+    runInsert(insertWindSpeed, String(windspdmph_avg2m));
+    runInsert(insertWindDirection, String(winddir_avg2m));
+    runInsert(insertGustSpeed, String(windgustmph_10m));
+    runInsert(insertGustDirection, String(windgustdir_10m));
+    runInsert(insertRain, String(rainin));
   }
 }
 
 
-void runInsert(const String query)
+void runInsert(const String query, const String value)
 {
+  String fullQuery = query + " (" + value + ", '6/16/23');";
   // Initiate the query class instance
   MySQL_Query query_mem = MySQL_Query(&conn);
 
   if (conn.connected())
   {
-    MYSQL_DISPLAY(query);
+    MYSQL_DISPLAY(fullQuery);
     
     // Execute the query
     // KH, check if valid before fetching
-    if ( !query_mem.execute(query.c_str()) )
+    if ( !query_mem.execute(fullQuery.c_str()) )
     {
       MYSQL_DISPLAY("Insert error");
     }
