@@ -304,14 +304,14 @@ int get_wind_direction()
 
 
 // SQL queries
-String insertTemp = "INSERT INTO weather.temperature (temp, date) VALUES";
-String insertHumidity = "INSERT INTO weather.humidity (humidity, date) VALUES";
-String insertPressure = "INSERT INTO weather.pressure (pressure, date) VALUES";
-String insertWindSpeed = "INSERT INTO weather.windSpeed (speed, date) VALUES";
-String insertWindDirection = "INSERT INTO weather.windDirection (direction, date) VALUES";
-String insertGustSpeed = "INSERT INTO weather.gustSpeed (speed, date) VALUES";
-String insertGustDirection = "INSERT INTO weather.gustDirection (direction, date) VALUES";
-String insertRain = "INSERT INTO weather.rain (quantity, date) VALUES";
+String insertTemp = "INSERT INTO weather.temperature (temp) VALUES";
+String insertHumidity = "INSERT INTO weather.humidity (humidity) VALUES";
+String insertPressure = "INSERT INTO weather.pressure (pressure) VALUES";
+String insertWindSpeed = "INSERT INTO weather.windSpeed (speed) VALUES";
+String insertWindDirection = "INSERT INTO weather.windDirection (direction) VALUES";
+String insertGustSpeed = "INSERT INTO weather.gustSpeed (speed) VALUES";
+String insertGustDirection = "INSERT INTO weather.gustDirection (direction) VALUES";
+String insertRain = "INSERT INTO weather.rain (quantity) VALUES";
 
 
 
@@ -357,7 +357,7 @@ void printWeather(const byte timeInterval)
 
 void runInsert(const String query, const String value)
 {
-  String fullQuery = query + " (" + value + ", '6/16/23');";
+  String fullQuery = query + " (" + value + ");";
   // Initiate the query class instance
   MySQL_Query query_mem = MySQL_Query(&conn);
 
