@@ -343,14 +343,22 @@ void printWeather(const byte timeInterval)
 
   //every 2 minutes, insert the values into the SQL tables
   if (timeInterval == 119) {
-    runInsert(insertTemp, String(temperature));
-    runInsert(insertHumidity, String(humidity));
-    runInsert(insertPressure, String(pressure));
-    runInsert(insertWindSpeed, String(windspdmph_avg2m));
-    runInsert(insertWindDirection, String(winddir_avg2m));
-    runInsert(insertGustSpeed, String(windgustmph_10m));
-    runInsert(insertGustDirection, String(windgustdir_10m));
-    runInsert(insertRain, String(rainin));
+    //connect to the database
+    if (conn.connectNonBlocking(server, server_port, dbUser, dbPassword) != RESULT_FAIL) {
+      delay(500);
+      
+      runInsert(insertTemp, String(temperature));
+      runInsert(insertHumidity, String(humidity));
+      runInsert(insertPressure, String(pressure));
+      runInsert(insertWindSpeed, String(windspdmph_avg2m));
+      runInsert(insertWindDirection, String(winddir_avg2m));
+      runInsert(insertGustSpeed, String(windgustmph_10m));
+      runInsert(insertGustDirection, String(windgustdir_10m));
+      runInsert(insertRain, String(rainin));
+
+      //close the connection after all inserts are done
+      conn.close(); 
+    }
   }
 }
 
